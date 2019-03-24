@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.329
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.API", "Authentication.API\Authentication.API.csproj", "{AA785F5A-730D-43F5-A354-D01B0DDB190A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StyleCop", "StyleCop", "{1BC3BFA9-B9F2-46CE-97A3-82C362C62E7C}"
+	ProjectSection(SolutionItems) = preProject
+		CustomStyleCopRules.ruleset = CustomStyleCopRules.ruleset
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{DABFEE1F-A89F-4761-AE8E-F5522CF726AC}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4F0A1DDE-E94C-4DA3-8BC2-254DDBAA9D0B}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA785F5A-730D-43F5-A354-D01B0DDB190A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA785F5A-730D-43F5-A354-D01B0DDB190A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA785F5A-730D-43F5-A354-D01B0DDB190A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA785F5A-730D-43F5-A354-D01B0DDB190A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1BC3BFA9-B9F2-46CE-97A3-82C362C62E7C} = {4F0A1DDE-E94C-4DA3-8BC2-254DDBAA9D0B}
+		{DABFEE1F-A89F-4761-AE8E-F5522CF726AC} = {4F0A1DDE-E94C-4DA3-8BC2-254DDBAA9D0B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6BAA4363-65FC-4FDA-89B5-375285800727}
+	EndGlobalSection
+EndGlobal
