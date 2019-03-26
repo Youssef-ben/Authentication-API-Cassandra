@@ -1,5 +1,7 @@
 ﻿namespace Authentication.API
 {
+    using AspNetCore.Identity.Cassandra.Extensions;
+    using Authentication.API.CustomIdentity;
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -8,7 +10,10 @@
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateWebHostBuilder(args)
+                .Build()
+                .InitializeIdentityDb<ApplicationUser, ApplicationRole>()
+                .Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
