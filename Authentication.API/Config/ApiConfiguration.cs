@@ -6,6 +6,7 @@
     using Authentication.API.CustomIdentity;
     using Cassandra;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -42,7 +43,7 @@
         {
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddCassandraErrorDescriber<CassandraErrorDescriber>()
-                .UseCassandraStores<ISession>()
+                .UseCassandraStores<Cassandra.ISession>()
                 .AddDefaultTokenProviders();
         }
 
@@ -51,6 +52,16 @@
             var options = configuration.GetConfigurationInstance<JwtOptions>("Jwt");
 
             var key = Encoding.ASCII.GetBytes(options.JwtKey);
+            var tokenParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+
+                ValidateIssuer = false,
+                ValidateAudience = false,
+
+                ValidateLifetime = true,
+            };
 
             services.AddAuthentication(x =>
             {
@@ -60,13 +71,20 @@
             .AddJwtBearer(x =>
             {
                 x.RequireHttpsMetadata = false;
+                x.IncludeErrorDetails = true;
                 x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+
+                x.TokenValidationParameters = tokenParameters;
+
+                x.Events = new JwtBearerEvents
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    OnAuthenticationFailed = c =>
+                    {
+                        c.NoResult();
+                        c.Response.StatusCode = 401;
+                        c.Response.ContentType = "application/json";
+                        return c.Response.WriteAsync(c.Exception.ToString());
+                    }
                 };
             });
         }
