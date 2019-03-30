@@ -1,7 +1,8 @@
 ﻿namespace Authentication.API
 {
-    using AspNetCore.Identity.Cassandra;
     using Authentication.API.Config;
+    using Authentication.API.Config.Settings;
+    using Authentication.API.Config.Validation;
     using Authentication.API.CustomIdentity;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -22,9 +23,12 @@
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // Register the classes needed for the configuration validation.
+            ApiConfiguration.ConfigureSettingsValidator(services);
+
             services.AddOptions();
-            services.Configure<CassandraOptions>(this.Configuration.GetSection("Cassandra"));
-            services.Configure<JwtOptions>(this.Configuration.GetSection("Jwt"));
+            services.ConfigureAndValidate<CassandraSettings>(this.Configuration);
+            services.ConfigureAndValidate<JwtSettings>(this.Configuration);
 
             services.AddCors(options =>
             {
@@ -40,8 +44,10 @@
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            // Register all the API classes.
             ApiConfiguration.Configure(services, this.Configuration);
 
+            // Register Cassandra Identity Managers
             services.AddTransient<ApplicationSignInManager>();
             services.AddTransient<ApplicationUserManager>();
         }
@@ -58,6 +64,9 @@
             }
 
             app.UseCors(this.allowOriginPolicy);
+
+            // API Custom Validation for the IOptions.
+            app.UseCustomSettingsValidation(this.Configuration);
 
             app.UseAuthentication();
             app.UseHttpsRedirection();

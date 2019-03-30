@@ -24,7 +24,7 @@
 
                  // You can set ASPNETCORE_ENVIRONMENT = Local, Development, Staging or Production
                  config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                 config.AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: false, reloadOnChange: true);
+                 config.AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
                  config.AddEnvironmentVariables();
                  config.AddCommandLine(args);
              })

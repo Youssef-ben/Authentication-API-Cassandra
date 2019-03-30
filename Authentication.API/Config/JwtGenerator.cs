@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Security.Claims;
     using System.Text;
+    using Authentication.API.Config.Settings;
     using Authentication.API.CustomIdentity;
     using Authentication.API.Models;
     using Microsoft.Extensions.Options;
@@ -13,7 +14,7 @@
 
     public class JwtGenerator
     {
-        public static JwtDto GenerateJwtToken(ApplicationUser user, IOptionsSnapshot<JwtOptions> jwtOptions)
+        public static JwtDto GenerateJwtToken(ApplicationUser user, IOptionsSnapshot<JwtSettings> jwtOptions)
         {
             var options = jwtOptions.Value;
 
@@ -51,7 +52,7 @@
             };
         }
 
-        public static string GenerateSimpleJwt(ApplicationUser user, IOptionsSnapshot<JwtOptions> jwtOptions)
+        public static string GenerateSimpleJwt(ApplicationUser user, IOptionsSnapshot<JwtSettings> jwtOptions)
         {
             var options = jwtOptions.Value;
 

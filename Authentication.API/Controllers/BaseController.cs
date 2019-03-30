@@ -10,7 +10,7 @@
     [ApiController]
     public class BaseController : ControllerBase
     {
-        public string GetUserId()
+        public string GetCurrentUserId()
         {
             if (this.User is null)
             {

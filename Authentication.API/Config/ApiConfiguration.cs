@@ -3,7 +3,10 @@
     using System.Text;
     using AspNetCore.Identity.Cassandra;
     using AspNetCore.Identity.Cassandra.Extensions;
+    using Authentication.API.Config.Settings;
+    using Authentication.API.Config.Validation;
     using Authentication.API.CustomIdentity;
+    using Authentication.API.Models;
     using Cassandra;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Http;
@@ -23,9 +26,14 @@
             ConfigureJwtToken(services, configuration);
         }
 
+        public static void ConfigureSettingsValidator(IServiceCollection services)
+        {
+            services.AddTransient<IValidatedSettings<JwtSettings>, ValidateSettings<JwtSettings>>();
+        }
+
         private static void ConfigureCassandraSession(IServiceCollection services, IConfiguration configuration)
         {
-            var options = configuration.GetConfigurationInstance<CassandraOptions>("Cassandra");
+            var options = configuration.GetConfigurationInstance<CassandraOptions>(nameof(CassandraSettings));
 
             services.AddCassandraSession(() =>
             {
@@ -49,7 +57,7 @@
 
         private static void ConfigureJwtToken(IServiceCollection services, IConfiguration configuration)
         {
-            var options = configuration.GetConfigurationInstance<JwtOptions>("Jwt");
+            var options = configuration.GetConfigurationInstance<JwtSettings>(nameof(JwtSettings));
 
             var key = Encoding.ASCII.GetBytes(options.JwtKey);
             var tokenParameters = new TokenValidationParameters
@@ -87,21 +95,6 @@
                     }
                 };
             });
-        }
-
-        /// <summary>
-        /// Extension Used to Create an IOptionsSnapshot instance of the specified configuration Section.
-        /// </summary>
-        /// <typeparam name="TClass">Class to be used for the configuration.</typeparam>
-        /// <param name="self">{IConfiguration} The instance of the configuration object.</param>
-        /// <param name="section">{String} Section to be mapped</param>
-        /// <returns>New Instance of the Specified Section</returns>
-        private static TClass GetConfigurationInstance<TClass>(this IConfiguration self, string section)
-            where TClass : class, new()
-        {
-            var instance = new TClass();
-            self.Bind(section, instance);
-            return instance;
         }
     }
 }

@@ -26,27 +26,6 @@
         }
 
         [HttpGet]
-        [Route("me")]
-        public async Task<IActionResult> GetMeAsync()
-        {
-            try
-            {
-                var userID = this.GetUserId();
-                var user = await this.userManager.FindByIdAsync(userID);
-                if (user is null)
-                {
-                    return this.SetError($"The user with the [ID:'{this.User.Identity.Name}'] not found!!", "NotFound", StatusCodes.Status404NotFound);
-                }
-
-                return this.StatusCode(StatusCodes.Status200OK, user.ConvertToDto());
-            }
-            catch (Exception ex)
-            {
-                return this.SetError(ex.Message);
-            }
-        }
-
-        [HttpGet]
         public async Task<IActionResult> GetUserAsync(string username)
         {
             try
@@ -56,7 +35,17 @@
                     return this.SetError($"The parameter [{nameof(username)}] is required !!", "NullParameter", StatusCodes.Status400BadRequest);
                 }
 
-                var user = await this.userManager.FindByNameAsync(username);
+                ApplicationUser user;
+
+                if ("me".Equals(username.ToLower()))
+                {
+                    user = await this.userManager.FindByIdAsync(this.GetCurrentUserId());
+                }
+                else
+                {
+                    user = await this.userManager.FindByNameAsync(username);
+                }
+
                 if (user is null)
                 {
                     return this.SetError($"The user with the [Username:'{username}'] not found!!", "NotFound", StatusCodes.Status404NotFound);
@@ -110,6 +99,24 @@
             {
                 return this.SetError(ex.Message);
             }
+        }
+
+        [HttpPost]
+        [Route("role")]
+        public async Task<IActionResult> CreateRoleAsync([FromBody] ApplicationRole role)
+        {
+            if (role is null)
+            {
+                return this.StatusCode(StatusCodes.Status400BadRequest, new { Error = $"Parameter {nameof(role)} required." });
+            }
+
+            var result = await this.rolesManager.CreateAsync(role);
+            if (!result.Succeeded)
+            {
+                return this.StatusCode(StatusCodes.Status400BadRequest, new { Error = result.Errors });
+            }
+
+            return this.StatusCode(StatusCodes.Status200OK, role);
         }
     }
 }

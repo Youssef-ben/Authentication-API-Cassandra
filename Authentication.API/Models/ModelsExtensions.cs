@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using Authentication.API.CustomIdentity;
+    using Microsoft.Extensions.Configuration;
 
     public static class ModelsExtensions
     {
@@ -52,6 +53,21 @@
             {
                 UserName = self.Username
             };
+        }
+
+        /// <summary>
+        /// Extension Used to Create an instance of the specified configuration Section.
+        /// </summary>
+        /// <typeparam name="TClass">Class to be used for the configuration.</typeparam>
+        /// <param name="self">{IConfiguration} The instance of the configuration object.</param>
+        /// <param name="section">{String} Section to be mapped</param>
+        /// <returns>New Instance of the Specified Section</returns>
+        public static TClass GetConfigurationInstance<TClass>(this IConfiguration self, string section)
+            where TClass : class, new()
+        {
+            var instance = new TClass();
+            self.Bind(section, instance);
+            return instance;
         }
     }
 }
