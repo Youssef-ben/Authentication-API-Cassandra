@@ -5,7 +5,6 @@
     using AspNetCore.Identity.Cassandra;
     using Authentication.API.Config.Validation;
 
-#pragma warning disable CS0108
     public class CassandraSettings
     {
         [RequireOneElement(1)]
@@ -13,6 +12,9 @@
 
         [Required]
         public CassandraCredentials Credentials { get; set; }
+
+        [Required]
+        public int Port { get; set; }
 
         [Required]
         public string KeyspaceName { get; set; }
@@ -37,5 +39,4 @@
             };
         }
     }
-#pragma warning restore CS0108
 }

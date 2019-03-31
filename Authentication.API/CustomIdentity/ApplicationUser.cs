@@ -4,7 +4,7 @@
     using AspNetCore.Identity.Cassandra.Models;
     using Cassandra.Mapping.Attributes;
 
-    [Table("users", Keyspace = "identity")]
+    [Table("users")]
     public class ApplicationUser : CassandraIdentityUser
     {
         public ApplicationUser()

@@ -3,7 +3,6 @@
     using Authentication.API.Config;
     using Authentication.API.Config.Settings;
     using Authentication.API.Config.Validation;
-    using Authentication.API.CustomIdentity;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
@@ -46,10 +45,6 @@
 
             // Register all the API classes.
             ApiConfiguration.Configure(services, this.Configuration);
-
-            // Register Cassandra Identity Managers
-            services.AddTransient<ApplicationSignInManager>();
-            services.AddTransient<ApplicationUserManager>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -69,8 +64,10 @@
             app.UseCustomSettingsValidation(this.Configuration);
 
             app.UseAuthentication();
-            app.UseHttpsRedirection();
             app.UseMvc();
+
+            // Create System User and role.
+            app.InitialData();
         }
     }
 }

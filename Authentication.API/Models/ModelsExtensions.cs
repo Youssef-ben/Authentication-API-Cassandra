@@ -55,6 +55,16 @@
             };
         }
 
+        public static ApplicationUser PatchFromDto(this ApplicationUser self, UserDto dto)
+        {
+            self.UserName = dto.Username;
+            self.Email = dto.Email;
+            self.Firstname = dto.Firstname;
+            self.Lastname = dto.Lastname;
+
+            return self;
+        }
+
         /// <summary>
         /// Extension Used to Create an instance of the specified configuration Section.
         /// </summary>

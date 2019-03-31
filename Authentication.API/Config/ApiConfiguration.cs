@@ -9,6 +9,7 @@
     using Authentication.API.Models;
     using Cassandra;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.Extensions.Configuration;
@@ -24,6 +25,10 @@
             ConfigureCassandraIdentity(services);
 
             ConfigureJwtToken(services, configuration);
+
+            // Register Cassandra Identity Managers
+            services.AddTransient<ApplicationSignInManager>();
+            services.AddTransient<ApplicationUserManager>();
         }
 
         public static void ConfigureSettingsValidator(IServiceCollection services)
@@ -31,16 +36,25 @@
             services.AddTransient<IValidatedSettings<JwtSettings>, ValidateSettings<JwtSettings>>();
         }
 
+        public static void InitialData(this IApplicationBuilder self)
+        {
+            var userManager = self.ApplicationServices.GetService<ApplicationUserManager>();
+            var roleManager = self.ApplicationServices.GetService<RoleManager<ApplicationRole>>();
+
+            roleManager.CreateRoleAsync();
+            userManager.CreateSystemUser();
+        }
+
         private static void ConfigureCassandraSession(IServiceCollection services, IConfiguration configuration)
         {
             var options = configuration.GetConfigurationInstance<CassandraOptions>(nameof(CassandraSettings));
+            var portOptions = configuration.GetConfigurationInstance<CassandraSettings>(nameof(CassandraSettings));
 
             services.AddCassandraSession(() =>
             {
-                var contactPoints = options.ContactPoints;
-
                 return Cluster.Builder()
-                    .AddContactPoints(contactPoints)
+                    .AddContactPoints(options.ContactPoints)
+                    .WithPort(portOptions.Port)
                     .WithCredentials(options.Credentials.UserName, options.Credentials.Password)
                     .Build()
                     .Connect();
@@ -95,6 +109,31 @@
                     }
                 };
             });
+        }
+
+        private static async void CreateRoleAsync(this RoleManager<ApplicationRole> self)
+        {
+            var role = new ApplicationRole()
+            {
+                Name = "Admin"
+            };
+
+            var result = await self.CreateAsync(role);
+        }
+
+        private static async void CreateSystemUser(this ApplicationUserManager self)
+        {
+            var user = new ApplicationUser()
+            {
+                Firstname = "Ucef",
+                Lastname = "Ben",
+                UserName = "ucef-ben@hotmail.fr",
+                Email = "ucef-ben@hotmail.fr",
+            };
+
+            var result = await self.CreateAsync(user, "Azerty&0123");
+
+            var roleResult = await self.AddToRoleAsync(user, "ADMIN");
         }
     }
 }

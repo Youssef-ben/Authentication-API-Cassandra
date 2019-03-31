@@ -79,6 +79,14 @@
             return self;
         }
 
+        /// <summary>
+        /// Add {OnChange} listener for the IOptionMonitor.
+        /// </summary>
+        /// <typeparam name="SettingsClass">{Class} The setting class.</typeparam>
+        /// <param name="self">{OptionMonitor}</param>
+        /// <param name="provider">{ServiceProvider}</param>
+        /// <param name="config">{Iconfiguration}</param>
+        /// <returns>{OptionMonitor} the new value.</returns>
         private static IOptionsMonitor<SettingsClass> AddOnChangeToMonitor<SettingsClass>(this IOptionsMonitor<SettingsClass> self, IServiceProvider provider, IConfiguration config)
             where SettingsClass : class, new()
         {

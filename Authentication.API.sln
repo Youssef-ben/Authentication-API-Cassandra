@@ -13,12 +13,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{DABFEE1F-A89F-4761-AE8E-F5522CF726AC}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
+		docker-compose.development.yml = docker-compose.development.yml
+		docker-compose.yml = docker-compose.yml
 		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4F0A1DDE-E94C-4DA3-8BC2-254DDBAA9D0B}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		makefile = makefile
 	EndProjectSection
 EndProject
 Global

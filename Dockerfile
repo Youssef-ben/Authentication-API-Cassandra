@@ -1,21 +1,27 @@
-FROM microsoft/dotnet:2.1-aspnetcore-runtime-alpine AS base
+## Base Configuration
+FROM microsoft/dotnet:2.2-aspnetcore-runtime-alpine AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 5000
 
-FROM microsoft/dotnet:2.1-sdk AS build
+## Restore and build the project
+FROM microsoft/dotnet:2.2-sdk AS builder
 WORKDIR /src
+COPY *.sln ./
 COPY ["Authentication.API/Authentication.API.csproj", "Authentication.API/"]
-RUN dotnet restore "Authentication.API/Authentication.API.csproj"
+RUN dotnet restore
 
 COPY . .
-WORKDIR "/src/Authentication.API"
-RUN dotnet build "Authentication.API.csproj" -c Release -o /app
+WORKDIR /src/Authentication.API
+RUN dotnet build -c Configuration=Release -o /app
 
-FROM build AS publish
-RUN dotnet publish "Authentication.API.csproj" -c Release -o /app
 
+## Publish the project
+FROM builder AS publish
+RUN dotnet publish -c Release -o /app
+
+## Build image
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
+
 ENTRYPOINT ["dotnet", "Authentication.API.dll"]

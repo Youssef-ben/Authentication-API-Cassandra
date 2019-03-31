@@ -26,6 +26,7 @@
         }
 
         [HttpGet]
+        [Route("{username}")]
         public async Task<IActionResult> GetUserAsync(string username)
         {
             try
@@ -60,6 +61,7 @@
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> CreateUserAsync([FromBody] UserDto userDto)
         {
             try
@@ -101,22 +103,73 @@
             }
         }
 
-        [HttpPost]
-        [Route("role")]
-        public async Task<IActionResult> CreateRoleAsync([FromBody] ApplicationRole role)
+        [HttpPut]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> UpdateUserAsync(string id, [FromBody] UserDto userDto)
         {
-            if (role is null)
+            try
             {
-                return this.StatusCode(StatusCodes.Status400BadRequest, new { Error = $"Parameter {nameof(role)} required." });
-            }
+                if (userDto is null
+                    || string.IsNullOrWhiteSpace(id)
+                    || string.IsNullOrWhiteSpace(userDto.Email)
+                    || string.IsNullOrWhiteSpace(userDto.Username)
+                    || string.IsNullOrWhiteSpace(userDto.Lastname)
+                    || string.IsNullOrWhiteSpace(userDto.Firstname))
+                {
+                    return this.SetError($"The user object has some invalid parameters", "NullParameter", StatusCodes.Status400BadRequest);
+                }
 
-            var result = await this.rolesManager.CreateAsync(role);
-            if (!result.Succeeded)
+                var user = await this.userManager.FindByIdAsync(id);
+                if (user is null)
+                {
+                    return this.SetError($"The user with the [Id:'{id}'] not found!!", "NotFound", StatusCodes.Status404NotFound);
+                }
+
+                var result = await this.userManager.UpdateAsync(user.PatchFromDto(userDto));
+                if (!result.Succeeded)
+                {
+                    var error = result.Errors.FirstOrDefault();
+                    return this.SetError(error.Description, error.Code, StatusCodes.Status500InternalServerError);
+                }
+
+                return this.StatusCode(StatusCodes.Status200OK, user.ConvertToDto());
+            }
+            catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status400BadRequest, new { Error = result.Errors });
+                return this.SetError(ex.Message);
             }
+        }
 
-            return this.StatusCode(StatusCodes.Status200OK, role);
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> DeleteUserAsync(string id)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return this.SetError($"The parameter [ID] is required!", "NullParameter", StatusCodes.Status400BadRequest);
+                }
+
+                var user = await this.userManager.FindByIdAsync(id);
+                if (user is null)
+                {
+                    return this.SetError($"The user with the [Id:'{id}'] not found!!", "NotFound", StatusCodes.Status404NotFound);
+                }
+
+                var result = await this.userManager.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    var error = result.Errors.FirstOrDefault();
+                    return this.SetError(error.Description, error.Code, StatusCodes.Status500InternalServerError);
+                }
+
+                return this.StatusCode(StatusCodes.Status204NoContent);
+            }
+            catch (Exception ex)
+            {
+                return this.SetError(ex.Message);
+            }
         }
     }
 }

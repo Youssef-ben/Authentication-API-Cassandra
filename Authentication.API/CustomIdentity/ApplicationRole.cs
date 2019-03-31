@@ -4,7 +4,7 @@
     using AspNetCore.Identity.Cassandra.Models;
     using Cassandra.Mapping.Attributes;
 
-    [Table("roles", Keyspace = "identity")]
+    [Table("roles")]
     public class ApplicationRole : CassandraIdentityRole
     {
         public ApplicationRole()
