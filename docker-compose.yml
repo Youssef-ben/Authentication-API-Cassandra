@@ -1,0 +1,23 @@
+version : "3.6"
+
+networks:
+  auth-api-network:
+    name: auth-api-network
+    driver: bridge
+
+volumes:
+  auth-database:
+    name: ${DC_VOLUME}
+
+services:
+  database:
+    image: cassandra:latest
+    container_name: ${DC_CONTAINER_NAME}
+    environment:
+      - CASSANDRA_CLUSTER_NAME=${DC_CLUSTER_NAME}
+    volumes:
+      - auth-database:/var/lib/cassandra
+    ports:
+      - ${DC_PORT}:9042 
+    networks:
+      - auth-api-network

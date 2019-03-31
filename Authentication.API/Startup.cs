@@ -1,5 +1,8 @@
 ﻿namespace Authentication.API
 {
+    using Authentication.API.Config;
+    using Authentication.API.Config.Settings;
+    using Authentication.API.Config.Validation;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
@@ -19,6 +22,13 @@
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // Register the classes needed for the configuration validation.
+            ApiConfiguration.ConfigureSettingsValidator(services);
+
+            services.AddOptions();
+            services.ConfigureAndValidate<CassandraSettings>(this.Configuration);
+            services.ConfigureAndValidate<JwtSettings>(this.Configuration);
+
             services.AddCors(options =>
             {
                 options.AddPolicy(
@@ -31,7 +41,10 @@
 
             services
                 .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            // Register all the API classes.
+            ApiConfiguration.Configure(services, this.Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -47,8 +60,14 @@
 
             app.UseCors(this.allowOriginPolicy);
 
-            app.UseHttpsRedirection();
+            // API Custom Validation for the IOptions.
+            app.UseCustomSettingsValidation(this.Configuration);
+
+            app.UseAuthentication();
             app.UseMvc();
+
+            // Create System User and role.
+            app.InitialData();
         }
     }
 }
